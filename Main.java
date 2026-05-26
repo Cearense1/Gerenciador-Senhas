@@ -18,7 +18,7 @@ public class Main
             menu.exibirMenu();
             try
             {
-                escolha = scanner.nextInt();
+                escolha=scanner.nextInt();
                 scanner.nextLine();
             }
             catch (InputMismatchException e)
