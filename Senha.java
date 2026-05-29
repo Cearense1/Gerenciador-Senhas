@@ -25,4 +25,10 @@ public class Senha
     {
         return servico;
     }
+
+    public String getLogin()
+    {
+        return servico+";"+usuario+";"+senha;
+    }
+
 }
