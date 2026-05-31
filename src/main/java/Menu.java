@@ -7,6 +7,13 @@ public class Menu
         System.out.println("2. Listar senhas");
         System.out.println("3. Remover senha");
         System.out.println("4. Buscar senha");
-        System.out.println("5. Sair");
+        System.out.println("5. Mudar senha mestre");
+        System.out.println("6. Deletar senha mestre");
+        System.out.println("7. Sair");
+    }
+
+    public void menuMestre()
+    {
+        System.out.println("Digite a senha mestra:");
     }
 }

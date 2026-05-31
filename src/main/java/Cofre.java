@@ -1,7 +1,6 @@
 import java.util.List;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.nio.file.StandardOpenOption;
 import java.io.IOException;
 import java.util.ArrayList;
 
@@ -21,7 +20,7 @@ public class Cofre
                 listaSenha.add(converterLinha(linha));
             }
         }
-        catch(IOException e)
+        catch(IOException erro)
         {
             System.out.println("Erro ao ler arquivo!");
         }
@@ -34,22 +33,34 @@ public class Cofre
         return new Senha(partes[0],partes[1],partes[2]);
     }
 
-    public void addSenha(String servico, String usuario, String senha) 
+    private void salvarArquivo()
     {
         try
         {
-            Senha novaSenha=new Senha(servico,usuario,senha);
-            Files.writeString(Paths.get(arquivo),
-            novaSenha.getLogin(), 
-            StandardOpenOption.CREATE, StandardOpenOption.APPEND);
+           List<String> linhas=new ArrayList<>();
 
-            System.out.println("Senha adicionada com sucesso!");
+            for(Senha senha:listaSenha)
+            {
+                linhas.add(senha.getLogin());
+            }
+
+            Files.write(Paths.get(arquivo), linhas);
         }
+
         catch(IOException e)
         {
-            System.out.println("Erro ao escrever arquivo!");
+        System.out.println("Erro ao salvar arquivo!");
         }
+    }
+
+    public void addSenha(String servico, String usuario, String senha) 
+    {
+        Senha novaSenha=new Senha(servico,usuario,senha);
+        listaSenha.add(novaSenha);
+
+        salvarArquivo();
         
+        System.out.println("Senha adicionada com sucesso!");
     }
 
     public void listarSenhas() 
@@ -72,42 +83,31 @@ public class Cofre
 
     public void removeSenha(String servico)
     {
-        try
-        {
-            List<String> linhas=Files.readAllLines(Paths.get("senhas.txt"));
-            linhas.removeIf(linha->linha.split(";")[0].equals(servico));
+        boolean removido=listaSenha.removeIf(senha->senha.getServico().equals(servico));
 
-            Files.write(Paths.get("senhas.txt"),linhas);
+        if(removido)
+        {
+            salvarArquivo();
             System.out.println("Senha removida com sucesso!");
         }
-        catch(IOException e)
+
+        else
         {
-            System.out.println("Erro ao remover senha!");
+            System.out.println("Serviço não encontrado!");
         }
     }
 
-    public String buscaSenha(String servico)
+    public Senha buscaSenha(String servico)
     {
-        try
+        for(Senha senha:listaSenha)
         {
-            List<String> linhas=Files.readAllLines(Paths.get("senhas.txt"));
-
-            for(String linha:linhas)
+            if(senha.getServico().equals(servico))
             {
-                String[] partes=linha.split(";");
-
-                if(partes[0].equals(servico))
-                {
-                    return partes[2];
-                }           
+                return senha;
             }
-            return "NULL"; 
         }
-        catch(IOException e)
-        {
-            System.out.println("Senha não encontrada!");
-            return "NULL";
-        }
+
+        return null;
     }
 
 }

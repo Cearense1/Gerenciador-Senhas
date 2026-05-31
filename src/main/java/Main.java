@@ -3,15 +3,34 @@ import java.util.InputMismatchException;
 
 public class Main 
 {
-    public static void main(String[] args) 
+    public static void main(String[] args) throws InterruptedException
     {
         Menu menu = new Menu();
         Cofre cofre = new Cofre();
-        int escolha;
+        int escolha,falhas=0;
+        String senhaMestre, novaSenha;
 
         boolean rodando=true;
         Scanner scanner=new Scanner(System.in);
         
+        if(!Autenticador.senhaExiste())
+        {
+            System.out.println("Crie a senha mestre:");
+            senhaMestre=scanner.nextLine();
+            Autenticador.criaSenha(senhaMestre);
+        }
+
+        menu.menuMestre();
+        senhaMestre=scanner.nextLine();
+
+        while(!Autenticador.validar(senhaMestre))
+        {
+            Thread.sleep((long)Math.pow(2,falhas)*1000);//dificulta ataques brute force
+            falhas++;
+
+            System.out.println("Senha incorreta! Tente novamente:");
+            senhaMestre=scanner.nextLine();
+        }
 
         while(rodando)
         {
@@ -27,7 +46,7 @@ public class Main
                 scanner.nextLine();
 
                 continue;
-                }   
+            }   
 
             switch (escolha) 
             {
@@ -61,16 +80,48 @@ public class Main
                 System.out.println("De que serviço deseja buscar a senha?");
                 String servicoBuscar=scanner.nextLine();
 
-                if(!cofre.buscaSenha(servicoBuscar).equals("NULL"))
+                if(!cofre.buscaSenha(servicoBuscar).equals(null))
                 {
-                    System.out.println("Senha: "+cofre.buscaSenha(servicoBuscar));
+                    System.out.println("Senha: "+cofre.buscaSenha(servicoBuscar).getSenha());
                 }
                 else
                     System.out.println("Senha não encontrada!");
 
                 break;
             case 5:
-                System.out.println("Opção 5 selecionada\nEncerrando programa...");
+                System.out.println("Digite a senha atual:");
+                senhaMestre=scanner.nextLine();
+
+                if(!Autenticador.validar(senhaMestre))
+                {
+                    System.out.println("Senha incorreta!");
+                    break;
+                }
+
+                System.out.println("Digite a nova senha");
+                novaSenha=scanner.nextLine();
+                Autenticador.alteraSenha(novaSenha);
+                break;
+            case 6:
+                System.out.println("Digite a senha atual:");
+                senhaMestre=scanner.nextLine();
+
+                if(!Autenticador.validar(senhaMestre))
+                {
+                    System.out.println("Senha incorreta!");
+                    break;
+                }
+
+                if(!Autenticador.deletaSenha(senhaMestre))
+                {
+                    System.out.println("Erro ao deletar a senha!");
+                    break;
+                }
+
+                System.out.println("Senha deletada com sucesso!");
+                break;
+            case 7:
+                System.out.println("Opção 7 selecionada\nEncerrando programa...");
                 scanner.close();
                 rodando=false;
                 break;
